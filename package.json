@@ -11,11 +11,15 @@
     "prettier:check": "prettier . --check"
   },
   "dependencies": {
+    "crypto": "^1.0.1",
+    "jose": "^5.4.0",
+    "js-cookie": "^3.0.5",
+    "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.3"
+    "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
