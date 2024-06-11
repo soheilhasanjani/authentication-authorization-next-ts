@@ -7,10 +7,12 @@ export interface AuthContextType {
   logout: () => void;
   redirectPath: string;
   noAccessRedirectPath?: string;
+  noAuthRedirectPath: string;
 }
 
 export interface AuthProviderProps {
   children: React.ReactNode;
   redirectPath: string;
   noAccessRedirectPath?: string;
+  noAuthRedirectPath: string;
 }

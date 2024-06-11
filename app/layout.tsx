@@ -15,7 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider redirectPath="/login" noAccessRedirectPath="/no-access">
+        <AuthProvider
+          redirectPath="/login"
+          noAccessRedirectPath="/no-access"
+          noAuthRedirectPath="/dashboard"
+        >
           {children}
         </AuthProvider>
       </body>

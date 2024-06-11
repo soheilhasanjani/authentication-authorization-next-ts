@@ -1,7 +1,14 @@
 // auth/context.tsx
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useReducer, useEffect, useContext } from "react";
 import Cookies from "js-cookie";
 import { AuthContextType, AuthProviderProps } from "./types";
+import { authReducer, initialState } from "./reducer";
+import {
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS,
+  LOGIN_FAILURE,
+  LOGOUT,
+} from "./actionTypes";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -9,35 +16,39 @@ export const AuthProvider = ({
   children,
   redirectPath,
   noAccessRedirectPath,
+  noAuthRedirectPath,
 }: AuthProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [role, setRole] = useState<string | string[] | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
     const token = Cookies.get("authToken");
     if (token) {
-      setIsAuthenticated(true);
       const storedRole = Cookies.get("role");
-      if (storedRole) {
-        setRole(storedRole.includes(",") ? storedRole.split(",") : storedRole);
-      }
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: {
+          role: storedRole
+            ? storedRole.includes(",")
+              ? storedRole.split(",")
+              : storedRole
+            : null,
+        },
+      });
     }
-    setIsLoading(false);
   }, []);
 
   const login = async (token: string, role?: string | string[]) => {
+    dispatch({ type: LOGIN_REQUEST });
     try {
       Cookies.set("authToken", token, { expires: 7 });
       if (role) {
         Cookies.set("role", Array.isArray(role) ? role.join(",") : role, {
           expires: 7,
         });
-        setRole(role);
       }
-      setIsAuthenticated(true);
+      dispatch({ type: LOGIN_SUCCESS, payload: { role } });
     } catch (error) {
-      console.error("Login failed:", error);
+      dispatch({ type: LOGIN_FAILURE });
       throw new Error("Invalid login data");
     }
   };
@@ -45,20 +56,18 @@ export const AuthProvider = ({
   const logout = () => {
     Cookies.remove("authToken");
     Cookies.remove("role");
-    setIsAuthenticated(false);
-    setRole(null);
+    dispatch({ type: LOGOUT });
   };
 
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
-        role,
-        isLoading,
+        ...state,
         login,
         logout,
         redirectPath,
         noAccessRedirectPath,
+        noAuthRedirectPath,
       }}
     >
       {children}

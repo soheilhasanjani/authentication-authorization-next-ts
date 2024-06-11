@@ -1,7 +1,7 @@
 // app/login/page.tsx
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../auth";
+import { useAuth, withoutAuth } from "../../auth";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -64,4 +64,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default withoutAuth(Login);
